@@ -1,14 +1,13 @@
 import { useState } from 'react';
-import { nanoid } from 'nanoid';
 import styles from './Form.module.css';
-import { useSelector, useDispatch } from 'react-redux/es/exports';
-import { add } from 'redux/contactList/slice';
+import { useGetContactQuery } from 'redux/ContactApi';
+import { useAddContactMutation } from 'redux/ContactApi';
 
 const Form = () => {
-  const contacts = useSelector(state => state.contactList);
+  const { data } = useGetContactQuery();
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
-  const dispatch = useDispatch();
+  const [addContact] = useAddContactMutation();
 
   const handleInputChange = evt => {
     const { name, value } = evt.target;
@@ -32,11 +31,10 @@ const Form = () => {
   const handleFormSubmit = evt => {
     evt.preventDefault();
     const newContact = {
-      id: nanoid(),
       name,
       number,
     };
-    const checkNewName = contacts.find(
+    const checkNewName = data.find(
       contact => contact.name.toLowerCase() === newContact.name.toLowerCase()
     );
     if (checkNewName) {
@@ -44,7 +42,7 @@ const Form = () => {
       return;
     }
 
-    dispatch(add(newContact));
+    addContact(newContact);
     resetForm();
   };
 
